@@ -9,7 +9,9 @@ import (
 
 
 func main() {
-	consumer, err := sarama.NewConsumer([]string{"127.0.0.1:9092"}, nil)
+	config := sarama.NewConfig()
+	config.ClientID = "go-client"
+	consumer, err := sarama.NewConsumer([]string{"127.0.0.1:9092"}, config)
 	if err != nil {
 		panic(err)
 	}
