@@ -1,0 +1,12 @@
+input:
+    - kafka:
+        zk_connect: ["127.0.0.1:2181"]
+        group_id: xiangyun-logstash
+        topic: xiangyun_log_topic
+        type: xiangyun_log_platform
+    - kafka:
+        zk_connect: ["127.0.0.1:2181"]
+        group_id: xiangyun-logstash
+        topic: bi_webtrends
+        type: xiangyun_log_platform
+       

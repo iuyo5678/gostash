@@ -90,6 +90,9 @@ func ChangeWorkingDir(dir string) {
 
 func setup() {
 	runPrint("go", "get", "-v", "github.com/Shopify/sarama")
+	runPrint("go", "get", "-v", "gopkg.in/olivere/elastic.v3")
+	runPrint("go", "get", "-v", "gopkg.in/yaml.v2")
+
 }
 
 
