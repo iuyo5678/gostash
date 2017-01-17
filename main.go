@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 	"os"
-	//"reflect"
+	"reflect"
 	/*
 	"github.com/Shopify/sarama"
 	"gopkg.in/olivere/elastic.v3"
@@ -36,6 +36,21 @@ func main() {
 	
 	viper.ReadConfig(reader)
 
+	inputSlice := viper.Get("input")
+	v := reflect.ValueOf(inputSlice)
+
+    if v.Kind() == reflect.Slice {
+		num := v.Len()
+        for i := 0; i < num; i++ {
+            inputItem := v.Index(i).Interface()
+			inputItemType := reflect.ValueOf(inputItem)
+			log.Println(inputItemType.Kind())
+        }
+    }
+    
+	
+	log.Println(v)
+	
 	log.Println(viper.GetString("input.kafka.topic"))
 
 	
