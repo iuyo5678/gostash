@@ -1,9 +1,11 @@
 package main
 
 import (
-	config "github.com/gostash/config"
+	viper "github.com/spf13/viper"
 	"flag"
 	"log"
+	"os"
+	//"reflect"
 	/*
 	"github.com/Shopify/sarama"
 	"gopkg.in/olivere/elastic.v3"
@@ -16,14 +18,29 @@ import (
 
 
 func main() {
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	
 	var config_path string
     flag.StringVar(&config_path, "config", "./conf/gostash.yml", "Load the gostash config from a specific file")
 	flag.StringVar(&config_path, "f", "./conf/gostash.yml", "Load the gostash config from a specific file")
     flag.Parse()
 
-	gostash_config := config.ReadConfig(config_path)
+	reader, err := os.Open(config_path)
+    if err != nil {
+        log.Fatal("Failed to open %s", config_path)
+        panic("err to load config fiel")
+    }
+    defer reader.Close()
+	//设置配置文件ymal
+	viper.SetConfigType("yaml")
 	
-	log.Println(gostash_config)
+	viper.ReadConfig(reader)
+
+	log.Println(viper.GetString("input.kafka.topic"))
+
+	
+	
+	
 	/*
 	config := sarama.NewConfig()
 	config.ClientID = "go-client"
