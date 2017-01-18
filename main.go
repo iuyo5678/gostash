@@ -1,11 +1,12 @@
 package main
 
 import (
-	viper "github.com/spf13/viper"
+	"./config"
 	"flag"
 	"log"
 	"os"
-	"reflect"
+	viper "github.com/spf13/viper"
+	//"reflect"
 	/*
 	"github.com/Shopify/sarama"
 	"gopkg.in/olivere/elastic.v3"
@@ -15,7 +16,6 @@ import (
 	"os/signal"
     */
 )
-
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
@@ -28,7 +28,6 @@ func main() {
 	reader, err := os.Open(config_path)
     if err != nil {
         log.Fatal("Failed to open %s", config_path)
-        panic("err to load config fiel")
     }
     defer reader.Close()
 	//设置配置文件ymal
@@ -37,24 +36,31 @@ func main() {
 	viper.ReadConfig(reader)
 
 	inputSlice := viper.Get("input")
-	v := reflect.ValueOf(inputSlice)
+	
+    v, ok := inputSlice.([]interface{})
 
-    if v.Kind() == reflect.Slice {
-		num := v.Len()
-        for i := 0; i < num; i++ {
-            inputItem := v.Index(i).Interface()
-			inputItemType := reflect.ValueOf(inputItem)
-			log.Println(inputItemType.Kind())
+	if !ok {
+		log.Fatalln("error to parse input config!")
+	}
+	for index, inputItem := range v {
+		//log.Printf("%d : %s", index, inputItem)
+		inputConfigItem, ok := inputItem.(map[interface{}]interface{})
+		if !ok {
+			log.Fatalln("error to parse input item config!")
+    	}
+
+		for k, v := range inputConfigItem {
+            switch k{
+            case "kafka":
+				kafkaConfig := &config.KafkaConfig{}
+				err := kafkaConfig.FillStruct(v)
+                if err != nil {
+                    log.Println(err)
+                }
+        		log.Println(inputConfigItem["kafka"])
+            }
         }
-    }
-    
-	
-	log.Println(v)
-	
-	log.Println(viper.GetString("input.kafka.topic"))
-
-	
-	
+	}
 	
 	/*
 	config := sarama.NewConfig()

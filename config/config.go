@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"gopkg.in/yaml.v2"
@@ -70,3 +72,46 @@ func ReadConfig(config_path string) (map[string]interface{}) {
 
 	return config
 }
+
+type KafkaConfig struct {
+    GroupID int `json:"group_id"`
+    Topic []string `json:"topic"`
+    Tag []string `json:"tag"`
+    ZkHosts []string `json:"zk_hosts"`
+    Type string `json:"type"`
+}
+
+func SetField(obj interface{}, name string, value interface{}) error {
+    structValue := reflect.ValueOf(obj).Elem()
+    structFieldValue := structValue.FieldByName(name)
+
+    if !structFieldValue.IsValid() {
+        return fmt.Errorf("No such field: %s in obj", name)
+    }
+
+    if !structFieldValue.CanSet() {
+        return fmt.Errorf("Cannot set %s field value", name)
+    }
+
+    structFieldType := structFieldValue.Type()
+    val := reflect.ValueOf(value)
+    if structFieldType != val.Type() {
+        return errors.New("Provided value type didn't match obj field type")
+    }
+
+    structFieldValue.Set(val)
+    return nil
+}
+
+
+func (s *KafkaConfig) FillStruct(m map[interface{}]interface{}) error {
+    for k, v := range m {
+		key, _ := k.(string)
+        err := SetField(s, key, v)
+        if err != nil {
+            return err
+        }
+    }
+    return nil
+}
+
